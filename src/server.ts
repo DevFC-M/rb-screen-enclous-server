@@ -1,16 +1,22 @@
 import express from "express";
 import { Storage } from "@google-cloud/storage";
 
-let projectId = "";
-let keyFilename = ""; // A definir
-
+let projectId = "myprojecttest-381603";
+let keyFilename = "mykey.json"; // A definir
+  
 const storage = new Storage({
   projectId,
   keyFilename,
 });
-const bucket = storage.bucket("definir"); // A definir
+const bucket = storage.bucket("rb-test-example"); // A definir
 
 const app = express();
+
+app.get("/pullImages", async (request, response) => {
+  const [files] = await bucket.getMetadata();
+
+  response.send([files]);
+});
 
 app.get("/services", (request, response) => {
   return response.json([
