@@ -1,30 +1,32 @@
 import express from "express";
 import { Storage } from "@google-cloud/storage";
+import cors from "cors";
+import path from "path";
 
 let projectId = "myprojecttest-381603";
 let keyFilename = "mykey.json"; // A definir
-  
+
 const storage = new Storage({
   projectId,
   keyFilename,
 });
-const bucket = storage.bucket("rb-test-example"); // A definir
+const bucketGalery = "rb-test-example"; // A definir
+const bucketServices = "rb-servicestest";
 
 const app = express();
 
-app.get("/pullImages", async (request, response) => {
-  const [files] = await bucket.getMetadata();
+app.use(cors());
 
-  response.send([files]);
+app.get("/pullImages", async (request, response) => {
+  const [files] = await storage.bucket(bucketGalery).getFiles();
+
+  return response.json(files);
 });
 
-app.get("/services", (request, response) => {
-  return response.json([
-    { id: 1, name: "case" },
-    { id: 2, name: "screen" },
-    { id: 1, name: "case" },
-    { id: 1, name: "case" },
-  ]);
+app.get("/services", async (request, response) => {
+  const [services] = await storage.bucket(bucketServices).getFiles();
+
+  return response.json(services)
 });
 
 app.listen(3333, () => {
